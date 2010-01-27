@@ -23,17 +23,17 @@ cometWorker.port.onmessage = function(event){
 }
 
 // an example of using setTimeout in our event-loop
-function randomMessage(){
-    setTimeout(function(){
+function randomMessage() {
+    setTimeout(function() {
         cometWorker.port.postMessage("This is a random number " + Math.random() + " at a random time");
         randomMessage();
-    },Math.random() * 10000);
+    }, Math.random() * 10000);
     
 }
 randomMessage();
 
-map["/"] = function(env) {
-    var req = new Jack.Request(env),
+map["/"] = function(request) {
+    var req = new Jack.Request(request),
         res = new Jack.Response(),
         message = req.params("message");
     if (message) {
@@ -51,10 +51,10 @@ map["/"] = function(env) {
     return res.finish();
 }
 
-map["/listen"] = function(env) {
+map["/listen"] = function(request) {
     var write, promise = new Promise(); // we could use defer() to be more secure
     var response, writes = 0;
-    listeners.push(function(event){
+    listeners.push(function(event) {
         var message = event.data;
         // for each event, we indicate we have made progress, the write function
         // will then get set, and we can write to the stream
@@ -62,7 +62,7 @@ map["/listen"] = function(env) {
         write(message);
         nextLine();
         writes++;
-        function nextLine(){
+        function nextLine() {
             // HACK: Safari doesn't display chunked data until a certain number of bytes
             for (var i = 0; i < 10; i++) {
                 write("                                                                                                                  "); 
@@ -77,7 +77,7 @@ map["/listen"] = function(env) {
     response = {
         status: 200,
         headers: {"Content-Type":"text/html", "Transfer-Encoding":"chunked"},
-        body: {forEach: function(callback){
+        body: {forEach: function(callback) {
             // write will be called by the listener
             write = callback;
         }}
@@ -98,7 +98,7 @@ function setTimeout(callback, delay){
     queue = queue || require("event-queue");
     
     timer.schedule(new java.util.TimerTask({
-        run: function(){
+        run: function() {
             queue.enqueue(callback);
         }
     }), Math.floor(delay));

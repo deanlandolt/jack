@@ -6,7 +6,7 @@ var sessions = [];
 
 var map = {};
 
-map["/"] = function(env) {
+map["/"] = function(request) {
     var res = new Response();
     
     res.write('<input type="text" id="m" value="hello">');
@@ -18,8 +18,8 @@ map["/"] = function(env) {
     return res.finish();
 }
 
-map["/send"] = function(env) {
-    var req = new Request(env)
+map["/send"] = function(request) {
+    var req = new Request(request)
         res = new Response(),
         message = req.params("message");
         
@@ -38,10 +38,10 @@ map["/send"] = function(env) {
     return res.finish();
 }
 
-map["/listen"] = function(env) {
+map["/listen"] = function(request) {
     var response = new AsyncResponse({
         status : 200,
-        headers : { "Transfer-Encoding" : "chunked" },
+        headers : { "transfer-encoding" : "chunked" },
         body : [Array(1024).join(" ")]
     });
     

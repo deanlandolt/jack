@@ -1,13 +1,17 @@
 #!/usr/bin/env jackup
 
 // the "app" export is the default property used by jackup:
-exports.app = function(env) {
-    return {
-        status : 200,
-        headers : {"Content-Type":"text/plain"},
-        body : ["jackconfig.js is the default file jackup looks for!"]
-    };
-}
+exports.app = require("jack/lint").Lint(
+    require("jack/contentlength").ContentLength(
+        function(request) {
+            return {
+                status : 200,
+                headers : {"content-type":"text/plain"},
+                body : ["jackconfig.js is the default file jackup looks for!"]
+            };
+        }
+    )
+);
 
 // specify custom sets of middleware and initialization routines
 // by defining a function with the same name as the environment:

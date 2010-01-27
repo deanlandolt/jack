@@ -3,16 +3,16 @@ var Jack = require("jack");
 var map = {};
 
 // an extremely simple Jack application
-map["/hello"] = function(env) {
+map["/hello"] = function(req) {
     return {
         status : 200,
-        headers : {"Content-Type":"text/plain"},
-        body : ["Hello from " + env["SCRIPT_NAME"]]
+        headers : {"content-type": "text/plain"},
+        body : ["Hello from " + req.scriptName]
     };
 }
 
 // 1/6th the time this app will throw an exception
-map["/httproulette"] = function(env) {
+map["/httproulette"] = function(req) {
     // if you have the ShowExceptions middleware in the pipeline it will print the error.
     // otherwise the server/handler will print something
     if (Math.random() > 5/6)
@@ -28,8 +28,8 @@ map["/httproulette"] = function(env) {
 var form = '<form action="" method="get"><input type="text" name="name" value="" id="some_name"><input type="submit" value="go"></p></form>';
 
 // an index page demonstrating using a Response object
-map["/"] = function(env) {
-    var request = new Jack.Request(env),
+map["/"] = function(req) {
+    var request = new Jack.Request(req),
         response = new Jack.Response();
 
     response.write('hello ' + (request.GET("name") || form) +"<br />");
@@ -49,21 +49,21 @@ map["/"] = function(env) {
 map["/narwhal"] = Jack.Narwhal;
 
 // use the JSONP middleware on this one
-map["/jsontest"] = Jack.JSONP(function(env) {
+map["/jsontest"] = Jack.JSONP(function(req) {
     return {
         status : 200,
-        headers : { "Content-Type" : "application/json" },
+        headers : { "content-type" : "application/json" },
         body : ["{ \"hello\" : \"world\" }"]
     };
 });
 
 map["/files"] = Jack.File(".");
 
-map["/stream"] = function(env) {
+map["/stream"] = function(req) {
     return {
         status : 200,
-        headers : {"Content-Type":"text/html", "Transfer-Encoding":"chunked"},
-        body : { forEach : function(write) {
+        headers : {"content-type":"text/html", "transfer-encoding":"chunked"},
+        body : {forEach : function(write) {
             for (var i = 0; i < 50; i++) { 
                 java.lang.Thread.currentThread().sleep(100); 
                 write("hellohellohellohellohellohellohellohellohellohellohellohellohello<br />"); 
@@ -73,8 +73,8 @@ map["/stream"] = function(env) {
 }
 
 
-map["/stream1"] = function(env) {
-    var res = new Jack.Response(200, {"Transfer-Encoding":"chunked"});
+map["/stream1"] = function(req) {
+    var res = new Jack.Response(200, {"transfer-encoding":"chunked"});
     return res.finish(function(response) {
         for (var i = 0; i < 50; i++) { 
             java.lang.Thread.currentThread().sleep(100); 
@@ -83,11 +83,11 @@ map["/stream1"] = function(env) {
     });
 }
 
-map["/cookie"] = function(env) {
-    var request = new Jack.Request(env),
+map["/cookie"] = function(req) {
+    var request = new Jack.Request(req),
         response = new Jack.Response();
         
-    var name = request.POST("name");
+    var name = req.POST("name");
     
     if (typeof name === "string") {
         response.write("setting name: " + name + "<br />");
@@ -105,8 +105,8 @@ map["/cookie"] = function(env) {
     return response.finish();
 }
 
-map["/info"] = function(env) {
-    var request = new Jack.Request(env),
+map["/info"] = function(req) {
+    var request = new Jack.Request(req),
         response = new Jack.Response(200, { "Content-Type" : "text/plain" });
     
     var params = request.params();
